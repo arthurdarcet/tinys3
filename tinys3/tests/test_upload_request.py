@@ -40,7 +40,6 @@ class TestUploadRequest(unittest.TestCase):
         mock = self._mock_adapter(r)
 
         expected_headers = {
-            'x-amz-acl': 'public-read',
             'Content-Type': 'application/octet-stream'
         }
 
@@ -60,6 +59,33 @@ class TestUploadRequest(unittest.TestCase):
 
         return flexmock(raise_for_status=lambda: None)
 
+    def test_upload_public_acl(self):
+        """
+        Test automatic/explicit content type setting
+        """
+
+        # No need to test fallback case ('application/octet-stream'), because
+        # it was tested on the 'test_simple_upload' test
+
+        # Test auto content type guessing
+        r = UploadRequest(self.conn, 'test_zip_key.zip', self.dummy_data, 'bucket', public=True)
+
+        mock = self._mock_adapter(r)
+
+        expected_headers = {
+            'x-amz-acl': 'public-read',
+            'Content-Type': 'application/zip'
+        }
+
+        mock.should_receive('put').with_args(
+            'https://s3.amazonaws.com/bucket/test_zip_key.zip',
+            headers=expected_headers,
+            data=self.dummy_data,
+            auth=self.conn.auth
+        ).and_return(self._mock_response())
+
+        r.run()
+
     def test_upload_content_type(self):
         """
         Test automatic/explicit content type setting
@@ -74,7 +100,6 @@ class TestUploadRequest(unittest.TestCase):
         mock = self._mock_adapter(r)
 
         expected_headers = {
-            'x-amz-acl': 'public-read',
             'Content-Type': 'application/zip'
         }
 
@@ -93,7 +118,6 @@ class TestUploadRequest(unittest.TestCase):
         mock = self._mock_adapter(r)
 
         expected_headers = {
-            'x-amz-acl': 'public-read',
             'Content-Type': 'candy/smore'
         }
 
@@ -112,15 +136,13 @@ class TestUploadRequest(unittest.TestCase):
         """
 
         # Test max expiry headers
-
         r = UploadRequest(self.conn, 'test_zip_key.zip', self.dummy_data, 'bucket', expires='max')
 
         mock = self._mock_adapter(r)
 
         expected_headers = {
-            'x-amz-acl': 'public-read',
             'Content-Type': 'application/zip',
-            'Cache-Control': 'max-age=31536000, public'
+            'Cache-Control': 'max-age=31536000',
         }
 
         mock.should_receive('put').with_args(
@@ -138,9 +160,8 @@ class TestUploadRequest(unittest.TestCase):
         mock = self._mock_adapter(r)
 
         expected_headers = {
-            'x-amz-acl': 'public-read',
             'Content-Type': 'application/zip',
-            'Cache-Control': 'max-age=1337, public'
+            'Cache-Control': 'max-age=1337',
         }
 
         mock.should_receive('put').with_args(
@@ -153,15 +174,33 @@ class TestUploadRequest(unittest.TestCase):
         r.run()
 
         # Test timedelta expiry
-
         r = UploadRequest(self.conn, 'test_zip_key.zip', self.dummy_data, 'bucket', expires=timedelta(weeks=2))
+
+        mock = self._mock_adapter(r)
+
+        expected_headers = {
+            'Content-Type': 'application/zip',
+            'Cache-Control': 'max-age=1209600',
+        }
+
+        mock.should_receive('put').with_args(
+            'https://s3.amazonaws.com/bucket/test_zip_key.zip',
+            headers=expected_headers,
+            data=self.dummy_data,
+            auth=self.conn.auth
+        ).and_return(self._mock_response())
+
+        r.run()
+
+        # Test public
+        r = UploadRequest(self.conn, 'test_zip_key.zip', self.dummy_data, 'bucket', expires=42, public=True)
 
         mock = self._mock_adapter(r)
 
         expected_headers = {
             'x-amz-acl': 'public-read',
             'Content-Type': 'application/zip',
-            'Cache-Control': 'max-age=1209600, public'
+            'Cache-Control': 'max-age=42, public',
         }
 
         mock.should_receive('put').with_args(
@@ -184,7 +223,6 @@ class TestUploadRequest(unittest.TestCase):
         mock = self._mock_adapter(r)
 
         expected_headers = {
-            'x-amz-acl': 'public-read',
             'Content-Type': 'application/zip',
             'example-meta-key': 'example-meta-value'
         }
@@ -209,7 +247,6 @@ class TestUploadRequest(unittest.TestCase):
         mock = self._mock_adapter(r)
 
         expected_headers = {
-            'x-amz-acl': 'public-read',
             'Content-Type': 'application/zip',
         }
 
@@ -238,7 +275,6 @@ class TestUploadRequest(unittest.TestCase):
         mock = self._mock_adapter(r)
 
         expected_headers = {
-            'x-amz-acl': 'public-read',
             'Content-Type': 'application/zip',
         }
 

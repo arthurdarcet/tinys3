@@ -107,7 +107,7 @@ class TestNonUploadRequests(unittest.TestCase):
         Test the generation of a copy request
         """
 
-        r = CopyRequest(self.conn, 'from_key', 'from_bucket', 'to_key', 'to_bucket', None, False)
+        r = CopyRequest(self.conn, 'from_key', 'from_bucket', 'to_key', 'to_bucket', None)
 
         mock = self._mock_adapter(r)
 

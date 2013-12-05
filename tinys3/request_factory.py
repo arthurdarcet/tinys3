@@ -106,7 +106,7 @@ class ListRequest(S3Request):
 
 
 class UploadRequest(S3Request):
-    def __init__(self, conn, key, local_file, bucket, expires=None, content_type=None, public=True, extra_headers=None,
+    def __init__(self, conn, key, local_file, bucket, expires=None, content_type=None, public=False, extra_headers=None,
                  close=False, rewind=True):
         """
 
@@ -222,7 +222,7 @@ class DeleteRequest(S3Request):
 
 
 class CopyRequest(S3Request):
-    def __init__(self, conn, from_key, from_bucket, to_key, to_bucket, metadata=None, public=True):
+    def __init__(self, conn, from_key, from_bucket, to_key, to_bucket, metadata=None, public=False):
         super(CopyRequest, self).__init__(conn)
         self.from_key = from_key.lstrip('/')
         self.from_bucket = from_bucket
@@ -251,5 +251,5 @@ class CopyRequest(S3Request):
 
 
 class UpdateMetadataRequest(CopyRequest):
-    def __init__(self, conn, key, bucket, metadata=None, public=True):
+    def __init__(self, conn, key, bucket, metadata=None, public=False):
         super(UpdateMetadataRequest, self).__init__(conn, key, bucket, key, bucket, metadata=metadata, public=public)
