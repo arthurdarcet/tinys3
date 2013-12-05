@@ -74,7 +74,7 @@ class Base(object):
 
     def upload(self, key, local_file,
                bucket=None, expires=None, content_type=None,
-               public=True, headers=None, rewind=True, close=False):
+               public=False, headers=None, rewind=True, close=False):
         """
         Upload a file and store it under a key
 
@@ -124,7 +124,7 @@ class Base(object):
 
         return self.run(r)
 
-    def copy(self, from_key, from_bucket, to_key, to_bucket=None, metadata=None, public=True):
+    def copy(self, from_key, from_bucket, to_key, to_bucket=None, metadata=None, public=False):
         """
         Copy a key contents to another key/bucket with an option to update metadata/public state
 
@@ -152,7 +152,7 @@ class Base(object):
 
         return self.run(r)
 
-    def update_metadata(self, key, metadata=None, bucket=None, public=True):
+    def update_metadata(self, key, metadata=None, bucket=None, public=False):
         """
         Updates the metadata information for a file
 
